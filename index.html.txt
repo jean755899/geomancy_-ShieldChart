@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>地占盾型盤 - 精確排版版</title>
+    <style>
+        body { background: #1a1a1a; color: #d4af37; text-align: center; font-family: serif; margin: 0; padding: 5px; overflow-x: hidden; }
+        
+        .shield-container {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 2px;
+            width: 100%;
+            max-width: 600px;
+            margin: 10px auto;
+            border: 2px solid #d4af37;
+            padding: 5px;
+            background: #262626;
+            box-sizing: border-box;
+        }
+
+        .figure-card {
+            border: 1px solid #444;
+            padding: 4px 0;
+            background: #1f1f1f;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 0;
+        }
+
+        .dots { font-size: 14px; line-height: 1.1; margin: 3px 0; color: #f9d342; font-family: monospace; }
+        .name { font-size: 8px; font-weight: bold; color: #eee; white-space: nowrap; }
+        .index { font-size: 9px; color: #888; border-bottom: 1px solid #444; width: 90%; margin-bottom: 2px; }
+
+        /* 固定 1-8 號位置 (由右至左) */
+        .f1 { grid-column: 8; grid-row: 1; }
+        .f2 { grid-column: 7; grid-row: 1; }
+        .f3 { grid-column: 6; grid-row: 1; }
+        .f4 { grid-column: 5; grid-row: 1; }
+        .f5 { grid-column: 4; grid-row: 1; }
+        .f6 { grid-column: 3; grid-row: 1; }
+        .f7 { grid-column: 2; grid-row: 1; }
+        .f8 { grid-column: 1; grid-row: 1; }
+
+        /* 第二層 9-12 (跨 2 格) */
+        .f9  { grid-column: 7 / span 2; grid-row: 2; margin-top: 8px; border-top: 1px solid #d4af37; }
+        .f10 { grid-column: 5 / span 2; grid-row: 2; margin-top: 8px; border-top: 1px solid #d4af37; }
+        .f11 { grid-column: 3 / span 2; grid-row: 2; margin-top: 8px; border-top: 1px solid #d4af37; }
+        .f12 { grid-column: 1 / span 2; grid-row: 2; margin-top: 8px; border-top: 1px solid #d4af37; }
+
+        /* 第三層 13-14 (跨 4 格) */
+        .f13 { grid-column: 5 / span 4; grid-row: 3; margin-top: 12px; border-top: 1px solid #d4af37; }
+        .f14 { grid-column: 1 / span 4; grid-row: 3; margin-top: 12px; border-top: 1px solid #d4af37; }
+
+        /* 第四層 15 (底尖) */
+        .f15 { 
+            grid-column: 3 / span 4; grid-row: 4; 
+            margin: 15px auto 5px; width: 100%;
+            background: #333; border: 1px solid #d4af37;
+            clip-path: polygon(0 0, 100% 0, 50% 100%); padding-bottom: 20px;
+        }
+
+        button { background: #d4af37; color: #1a1a1a; border: none; padding: 10px 20px; font-size: 16px; font-weight: bold; border-radius: 5px; margin: 10px; }
+    </style>
+</head>
+<body>
+
+    <button onclick="cast()">啟動起卦儀式</button>
+    <div id="shield" class="shield-container"></div>
+
+    <script>
+        // 完全對照用戶提供圖表修正的名字
+        const figureNames = {
+            "1111": "Via",
+            "2222": "Populus",
+            "2121": "Conjunctio",
+            "1212": "Carcer",
+            "1222": "Caput Draconis",
+            "2111": "Cauda Draconis",
+            "1122": "Puella",
+            "2211": "Puer",
+            "2112": "Fortuna Major",
+            "1221": "Fortuna Minor",
+            "2122": "Rubeus",
+            "1211": "Albus",
+            "2212": "Acquisitio",
+            "1121": "Amissio",
+            "2221": "Tristitia",
+            "1112": "Laetitia"
+        };
+
+        function add(f1, f2) { return f1.map((v, i) => v === f2[i] ? 2 : 1); }
+
+        function renderDots(fig) {
+            return fig.map(v => v === 1 ? "●" : "● ●").join("<br>");
+        }
+
+        function makeHTML(fig, idx) {
+            const code = fig.join("");
+            return `<div class="figure-card f${idx}">
+                <div class="index">${idx}</div>
+                <div class="dots">${renderDots(fig)}</div>
+                <div class="name">${figureNames[code] || code}</div>
+            </div>`;
+        }
+
+        function cast() {
+            // 生成 1-4 母親
+            let m1 = [1,1,1,1].map(() => Math.floor(Math.random()*2)+1);
+            let m2 = [1,1,1,1].map(() => Math.floor(Math.random()*2)+1);
+            let m3 = [1,1,1,1].map(() => Math.floor(Math.random()*2)+1);
+            let m4 = [1,1,1,1].map(() => Math.floor(Math.random()*2)+1);
+            
+            // 提取 5-8 女兒
+            let d5 = [m1[0], m2[0], m3[0], m4[0]];
+            let d6 = [m1[1], m2[1], m3[1], m4[1]];
+            let d7 = [m1[2], m2[2], m3[2], m4[2]];
+            let d8 = [m1[3], m2[3], m3[3], m4[3]];
+            
+            // 推導 9-15 卦
+            let n9 = add(m1, m2); 
+            let n10 = add(m3, m4);
+            let n11 = add(d5, d6); 
+            let n12 = add(d7, d8);
+            let w13 = add(n9, n10); 
+            let w14 = add(n11, n12);
+            let j15 = add(w13, w14);
+
+            const all = [null, m1, m2, m3, m4, d5, d6, d7, d8, n9, n10, n11, n12, w13, w14, j15];
+            let html = "";
+            for(let i=1; i<=15; i++) { html += makeHTML(all[i], i); }
+            document.getElementById("shield").innerHTML = html;
+        }
+    </script>
+</body>
+</html>
