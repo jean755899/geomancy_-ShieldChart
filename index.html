@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>地占雙盤系統 - 修正版</title>
+    <title>地占雙盤系統 - 卦象修正版</title>
     <style>
         :root { --gold: #d4af37; --bg: #1a1a1a; --card: #262626; --text: #eee; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -44,30 +44,42 @@
         <button onclick="randomCast()" style="background:#444; color:#fff;">隨機起卦</button>
     </div>
     <div class="shield-box">
-        <div class="row-8" id="s_row1"></div><div class="row-4" id="s_row2"></div><div class="row-2" id="s_row3"></div><div class="row-1" id="s_row4"></div>
-        <div class="reconciler-wrap" id="s_row5"></div>
+        <div id="s_row1" class="row-8"></div><div id="s_row2" class="row-4"></div><div id="s_row3" class="row-2"></div><div id="s_row4" class="row-1"></div>
+        <div id="s_row5" class="reconciler-wrap"></div>
     </div>
     <h3>🏛️ House Chart</h3>
-    <div class="house-svg-container" id="h_container"></div>
+    <div id="h_container" class="house-svg-container"></div>
     <div class="footer">如有任何問題與意見回饋，請與我聯繫<br><b>instagram: grove_and_roots</b></div>
+
     <script>
-        // 核心對照表修正：Puer (1211), Puella (1121)
         const figureList = [
             {name:"Via",code:"1111"}, {name:"Populus",code:"2222"},
             {name:"Conjunctio",code:"2112"}, {name:"Carcer",code:"1221"},
-            {name:"Caput Draconis",code:"2111"}, {name:"Cauda Draconis",code:"1112"},
-            {name:"Puer",code:"1211"}, {name:"Puella",code:"1121"}, // <-- 已修正 Puer & Puella
+            {name:"Caput Draconis",code:"2111"}, {name:"Cauda",code:"1112"},
+            {name:"Puella",code:"1211"}, // 修正：1-2-1-1 (由上至下)
+            {name:"Puer",code:"1121"},   // 修正：1-1-2-1 (由上至下)
             {name:"Fortuna Major",code:"2211"}, {name:"Fortuna Minor",code:"1122"},
             {name:"Rubeus",code:"2122"}, {name:"Albus",code:"2212"},
             {name:"Acquisitio",code:"2121"}, {name:"Amissio",code:"1212"},
             {name:"Tristitia",code:"2221"}, {name:"Laetitia",code:"1222"}
         ];
-        const figureNames = {}; figureList.forEach(f => figureNames[f.code] = f.name);
+
+        const figureNames = {}; 
+        figureList.forEach(f => figureNames[f.code] = f.name);
+
         function add(f1, f2) { return f1.map((v, i) => v === f2[i] ? 2 : 1); }
         function renderDotsStr(fig) { return fig.map(v => v === 1 ? "●" : "● ●"); }
-        function createCell(fig, idx, className="") { const code = fig.join(""); const dots = renderDotsStr(fig).join("<br>"); return `<div class="cell ${className}"><div class="idx">${idx}</div><div class="dots">${dots}</div><div class="name">${figureNames[code]}</div></div>`; }
+        
+        function createCell(fig, idx, className="") { 
+            const code = fig.join(""); 
+            const dots = renderDotsStr(fig).join("<br>"); 
+            return `<div class="cell ${className}"><div class="idx">${idx}</div><div class="dots">${dots}</div><div class="name">${figureNames[code] || "Unknown"}</div></div>`; 
+        }
+
         function runShield(m1, m2, m3, m4) {
-            let d5=[m1[0],m2[0],m3[0],m4[0]], d6=[m1[1],m2[1],m3[1],m4[1]], d7=[m1[2],m2[2],m3[2],m4[2]], d8=[m1[3],m2[3],m3[3],m4[3]], n9=add(m1,m2), n10=add(m3,m4), n11=add(d5,d6), n12=add(d7,d8), w13=add(n9,n10), w14=add(n11,n12), j15=add(w13,w14), r16=add(m1,j15);
+            let d5=[m1[0],m2[0],m3[0],m4[0]], d6=[m1[1],m2[1],m3[1],m4[1]], d7=[m1[2],m2[2],m3[2],m4[2]], d8=[m1[3],m2[3],m3[3],m4[3]], 
+                n9=add(m1,m2), n10=add(m3,m4), n11=add(d5,d6), n12=add(d7,d8), 
+                w13=add(n9,n10), w14=add(n11,n12), j15=add(w13,w14), r16=add(m1,j15);
             const all = [null, m1, m2, m3, m4, d5, d6, d7, d8, n9, n10, n11, n12, w13, w14, j15, r16];
             document.getElementById("s_row1").innerHTML = [8,7,6,5,4,3,2,1].map(i => createCell(all[i], i)).join("");
             document.getElementById("s_row2").innerHTML = [12,11,10,9].map(i => createCell(all[i], i)).join("");
@@ -76,21 +88,41 @@
             document.getElementById("s_row5").innerHTML = createCell(all[16], 16, "f16");
             renderHouseSVG(all);
         }
+
         function renderHouseSVG(all) {
             const size = 320, mid = 160, iStart = 82, iEnd = 238;
-            let tp = 0, sp = 0; for (let i = 1; i <= 12; i++) { all[i].forEach(p => { tp += p; if (p === 1) sp += 1; }); }
+            let tp = 0, sp = 0; 
+            for (let i = 1; i <= 12; i++) { all[i].forEach(p => { tp += p; if (p === 1) sp += 1; }); }
             const pars = (tp % 12) || 12, idxP = (sp % 12) || 12;
             const centers = { 1:[52,160], 2:[42,242], 3:[78,281], 4:[160,275], 5:[242,281], 6:[272,242], 7:[268,160], 8:[272,72], 9:[242,39], 10:[160,45], 11:[78,39], 12:[48,72] };
             let svg = `<svg viewBox="0 0 ${size} ${size}"><rect x="5" y="5" width="310" height="310" class="line"/><polygon points="${mid},5 315,${mid} ${mid},315 5,${mid}" class="line"/><rect x="${iStart}" y="${iStart}" width="156" height="156" class="line"/><line x1="5" y1="5" x2="${iStart}" y2="${iStart}" class="line"/><line x1="315" y1="5" x2="${iEnd}" y2="${iStart}" class="line"/><line x1="5" y1="315" x2="${iStart}" y2="${iEnd}" class="line"/><line x1="315" y1="315" x2="${iEnd}" y2="${iEnd}" class="line"/><text x="${mid}" y="${mid-15}" fill="var(--gold)" font-size="12" text-anchor="middle" font-weight="bold">SOUL</text><text x="${mid}" y="${mid+8}" class="h-meta" text-anchor="middle">福點：${pars}</text><text x="${mid}" y="${mid+25}" class="h-meta" text-anchor="middle">index：${idxP}</text>`;
             for (let i = 1; i <= 12; i++) {
-                const [cx, cy] = centers[i]; const dots = renderDotsStr(all[i]); const name = figureNames[all[i].join("")]; let yOff = (i>=3&&i<=5)?-4:0;
+                const [cx, cy] = centers[i]; const dots = renderDotsStr(all[i]); const name = figureNames[all[i].join("")] || "Unknown"; let yOff = (i>=3&&i<=5)?-4:0;
                 svg += `<g transform="translate(${cx}, ${cy+yOff})"><text x="-16" y="-18" class="h-idx" text-anchor="middle">${i}</text><g transform="translate(0, -4)"><text y="-10" class="h-dots">${dots[0]}</text><text y="0" class="h-dots">${dots[1]}</text><text y="10" class="h-dots">${dots[2]}</text><text y="20" class="h-dots">${dots[3]}</text></g><text y="33" class="h-name">${name}</text></g>`;
             }
             svg += `</svg>`; document.getElementById("h_container").innerHTML = svg;
         }
-        function init() { ['m1_s','m2_s','m3_s','m4_s'].forEach(id => { const s = document.getElementById(id); figureList.sort((a,b)=>a.name.localeCompare(b.name)).forEach(f => { let o=document.createElement('option');o.value=f.code;o.text=f.name;s.appendChild(o); }); }); randomCast(); }
-        function manualCast() { const getV = (id) => document.getElementById(id).value.split("").map(Number); runShield(getV('m1_s'), getV('m2_s'), getV('m3_s'), getV('m4_s')); }
-        function randomCast() { const r = () => [1,1,1,1].map(() => Math.floor(Math.random()*2)+1); const m1=r(), m2=r(), m3=r(), m4=r(); document.getElementById('m1_s').value=m1.join(""); document.getElementById('m2_s').value=m2.join(""); document.getElementById('m3_s').value=m3.join(""); document.getElementById('m4_s').value=m4.join(""); runShield(m1, m2, m3, m4); }
+
+        function init() { 
+            ['m1_s','m2_s','m3_s','m4_s'].forEach(id => { 
+                const s = document.getElementById(id); s.innerHTML = "";
+                figureList.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(f => { 
+                    let o=document.createElement('option'); o.value=f.code; o.text=f.name; s.appendChild(o); 
+                }); 
+            }); 
+            randomCast(); 
+        }
+        window.manualCast = function() { 
+            const getV = (id) => document.getElementById(id).value.split("").map(Number); 
+            runShield(getV('m1_s'), getV('m2_s'), getV('m3_s'), getV('m4_s')); 
+        };
+        window.randomCast = function() { 
+            const r = () => [1,1,1,1].map(() => Math.floor(Math.random()*2)+1); 
+            const m1=r(), m2=r(), m3=r(), m4=r(); 
+            document.getElementById('m1_s').value=m1.join(""); document.getElementById('m2_s').value=m2.join(""); 
+            document.getElementById('m3_s').value=m3.join(""); document.getElementById('m4_s').value=m4.join(""); 
+            runShield(m1, m2, m3, m4); 
+        };
         init();
     </script>
 </body>
