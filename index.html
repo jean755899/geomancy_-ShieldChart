@@ -51,17 +51,16 @@
     <div class="house-svg-container" id="h_container"></div>
     <div class="footer">如有任何問題與意見回饋，請與我聯繫<br><b>instagram: grove_and_roots</b></div>
     <script>
-        // 修正後的卦象對應表
+        // 核心對照表修正：Puer (1211), Puella (1121)
         const figureList = [
-            {name:"Via",code:"1111"},{name:"Populus",code:"2222"},
-            {name:"Conjunctio",code:"2112"},{name:"Carcer",code:"1221"},
-            {name:"Caput Draconis",code:"2111"},{name:"Cauda",code:"1112"},
-            {name:"Puella",code:"1121"}, // 修正為女孩
-            {name:"Puer",code:"1211"},   // 修正為男孩
-            {name:"Fortuna Major",code:"2211"},{name:"Fortuna Minor",code:"1122"},
-            {name:"Rubeus",code:"2122"},{name:"Albus",code:"2212"},
-            {name:"Acquisitio",code:"2121"},{name:"Amissio",code:"1212"},
-            {name:"Tristitia",code:"2221"},{name:"Laetitia",code:"1222"}
+            {name:"Via",code:"1111"}, {name:"Populus",code:"2222"},
+            {name:"Conjunctio",code:"2112"}, {name:"Carcer",code:"1221"},
+            {name:"Caput Draconis",code:"2111"}, {name:"Cauda Draconis",code:"1112"},
+            {name:"Puer",code:"1211"}, {name:"Puella",code:"1121"}, // <-- 已修正 Puer & Puella
+            {name:"Fortuna Major",code:"2211"}, {name:"Fortuna Minor",code:"1122"},
+            {name:"Rubeus",code:"2122"}, {name:"Albus",code:"2212"},
+            {name:"Acquisitio",code:"2121"}, {name:"Amissio",code:"1212"},
+            {name:"Tristitia",code:"2221"}, {name:"Laetitia",code:"1222"}
         ];
         const figureNames = {}; figureList.forEach(f => figureNames[f.code] = f.name);
         function add(f1, f2) { return f1.map((v, i) => v === f2[i] ? 2 : 1); }
