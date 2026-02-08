@@ -3,7 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>地占雙盤系統 -（多模式）</title>
+  <title>地占雙盤系統</title>
+
+  <!-- 可選：分享預覽標題/描述（避免出現舊字樣） -->
+  <meta property="og:title" content="地占雙盤系統" />
+  <meta property="og:description" content="啟動起卦儀式" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://jean755899.github.io/geomancy_-ShieldChart/" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="地占雙盤系統" />
+  <meta name="twitter:description" content="啟動起卦儀式" />
+
   <style>
     :root { --gold: #d4af37; --bg: #1a1a1a; --card: #262626; --text: #eee; }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -45,11 +55,7 @@
       -webkit-user-select: none;
     }
     .pad.slide { touch-action: none; }
-    .pad.disabled {
-      opacity: 0.55;
-      filter: grayscale(0.2);
-      border-style: dashed;
-    }
+    .pad.disabled { opacity: 0.55; filter: grayscale(0.2); border-style: dashed; }
 
     .status-row { margin-top: 10px; color:#bdbdbd; font-size:12px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
     .status-row b { color: var(--gold); }
@@ -64,6 +70,64 @@
       font-size: 12px;
     }
     .pill b{ color: var(--gold); }
+
+    /* --- Question Box --- */
+    .qbox{
+      max-width: 520px;
+      margin: 0 auto 14px;
+      border: 1px solid rgba(212,175,55,0.45);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.02);
+      padding: 12px;
+      text-align: left;
+    }
+    .qbox label{
+      display:block;
+      font-weight: bold;
+      color: var(--gold);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .qbox textarea{
+      width: 100%;
+      min-height: 80px;
+      resize: vertical;
+      padding: 10px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(212,175,55,0.35);
+      background: rgba(0,0,0,0.35);
+      color: #eaeaea;
+      font-size: 13px;
+      line-height: 1.5;
+      outline: none;
+    }
+    .qbox textarea:focus{
+      border-color: rgba(212,175,55,0.7);
+      box-shadow: 0 0 0 2px rgba(212,175,55,0.15);
+    }
+    .qmeta{
+      margin-top: 8px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content: space-between;
+      color:#bdbdbd;
+      font-size: 12px;
+    }
+    .qmeta b{ color: var(--gold); }
+    .qpreview{
+      max-width: 520px;
+      margin: 0 auto 10px;
+      padding: 10px 12px;
+      border-left: 3px solid rgba(212,175,55,0.75);
+      background: rgba(212,175,55,0.05);
+      color:#dcdcdc;
+      text-align:left;
+      border-radius: 10px;
+      display:none;
+    }
+    .qpreview .t{ color: var(--gold); font-weight: bold; margin-bottom: 6px; font-size: 12px; }
+    .qpreview .c{ white-space: pre-wrap; font-size: 13px; line-height: 1.45; }
 
     /* --- Shake Coin UI --- */
     .coin-wrap{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
@@ -95,10 +159,8 @@
     }
     .coin-front{ transform: rotateY(0deg); }
     .coin-back{ transform: rotateY(180deg); color: rgba(255,255,255,0.85); }
-
     .coin.flip-heads{ animation: coinFlipHeads 520ms ease-out; }
     .coin.flip-tails{ animation: coinFlipTails 520ms ease-out; }
-
     @keyframes coinFlipHeads{
       0%{ transform: rotateY(0) rotateZ(0) scale(1); }
       35%{ transform: rotateY(270deg) rotateZ(8deg) scale(1.05); }
@@ -236,7 +298,7 @@
     </div>
   </div>
 
-  <!-- 滑動起卦（加啟動鍵，避免誤觸） -->
+  <!-- 滑動起卦（需先啟動，避免誤觸） -->
   <div class="mode-box">
     <div class="mode-title">按住滑動起卦（需先啟動）</div>
     <div class="mode-sub">
@@ -254,6 +316,22 @@
       <span>距離：<b id="gDist">0</b></span>
       <span>段數：<b id="gSeg">0</b>/16</span>
     </div>
+  </div>
+
+  <!-- 問題輸入（新增） -->
+  <div class="qbox">
+    <label for="questionInput">問題（可選填）</label>
+    <textarea id="questionInput" maxlength="300" placeholder="例如：這段關係接下來三個月的走向？ / 這個合作案是否值得投入？"></textarea>
+    <div class="qmeta">
+      <span>字數：<b id="qCount">0</b>/300</span>
+      <span>提示：起卦後會顯示在結果上方</span>
+    </div>
+  </div>
+
+  <!-- 問題預覽（起卦後顯示） -->
+  <div id="questionPreview" class="qpreview">
+    <div class="t">本次問題</div>
+    <div id="questionPreviewText" class="c"></div>
   </div>
 
   <div class="shield-box">
@@ -317,6 +395,29 @@
       </div>`;
     }
 
+    /* ---------------- 問題輸入：字數與顯示 ---------------- */
+    const qInput = document.getElementById("questionInput");
+    const qCount = document.getElementById("qCount");
+    const qPreview = document.getElementById("questionPreview");
+    const qPreviewText = document.getElementById("questionPreviewText");
+
+    function getQuestionText(){ return (qInput.value || "").trim(); }
+    function updateQuestionCount(){ qCount.textContent = String((qInput.value || "").length); }
+
+    function renderQuestionPreview(){
+      const q = getQuestionText();
+      if (!q){
+        qPreview.style.display = "none";
+        qPreviewText.textContent = "";
+        return;
+      }
+      qPreview.style.display = "block";
+      qPreviewText.textContent = q;
+    }
+
+    qInput.addEventListener("input", ()=>{ updateQuestionCount(); });
+    updateQuestionCount();
+
     /* ---------------- 盾盤/雙盤計算 ---------------- */
     function runShield(m1,m2,m3,m4){
       let d5=[m1[0],m2[0],m3[0],m4[0]],
@@ -337,6 +438,7 @@
       document.getElementById("s_row5").innerHTML = createCell(all[16],16,"f16");
 
       renderHouseSVG(all);
+      renderQuestionPreview(); // 起卦後顯示問題
     }
 
     /* ---------------- 12 宮位：只顯示卦象點型 ---------------- */
@@ -353,7 +455,7 @@
         9:[242,39], 10:[160,45], 11:[78,39],  12:[48,72]
       };
 
-      const OUT = 1.03; // 可自行改 1.02~1.04
+      const OUT = 1.03; // 1.02~1.04
       const centers = {};
       for (let i=1;i<=12;i++){
         const [x,y]=baseCenters[i];
@@ -470,7 +572,7 @@
       if (tapCount === 16) finalizeTapCast();
     });
 
-    /* ---------------- 方式 4：滑動起卦（需要啟動鍵） ---------------- */
+    /* ---------------- 方式 4：滑動起卦（需先啟動，避免誤觸） ---------------- */
     (function setupSlideCast(){
       const pad = document.getElementById("gesturePad");
       const gStatus = document.getElementById("gStatus");
@@ -561,7 +663,6 @@
         finalizeSlideCast();
       }
 
-      // Public controls
       window.enableSlideCast = function(){
         slideEnabled = true;
         pad.classList.remove("disabled");
@@ -578,7 +679,6 @@
         resetSlideUI();
       };
 
-      // Touch
       pad.addEventListener("touchstart", (e)=>{
         if (!slideEnabled) return;
         e.preventDefault();
@@ -599,13 +699,11 @@
         endSlide();
       }, {passive:false});
 
-      // Mouse
       pad.addEventListener("mousedown", (e)=>{ if(!slideEnabled) return; e.preventDefault(); startSlide(e.clientX, e.clientY); });
       window.addEventListener("mousemove", (e)=>{ moveSlide(e.clientX, e.clientY); });
       window.addEventListener("mouseup", ()=>{ endSlide(); });
 
-      // default locked
-      window.disableSlideCast();
+      window.disableSlideCast(); // 預設鎖定
     })();
 
     /* ---------------- 方式 5：搖晃投幣（含動畫） ---------------- */
@@ -618,8 +716,8 @@
     let shakePoints = [];
     let lastShakeTime = 0;
 
-    const SHAKE_THRESHOLD = 15;     // 12~18
-    const SHAKE_COOLDOWN_MS = 550;  // 550~800
+    const SHAKE_THRESHOLD = 15;
+    const SHAKE_COOLDOWN_MS = 550;
 
     function setShakeStatus(t){ shakeStatusEl.textContent = t; }
     function setShakeProg(n){ shakeProgEl.textContent = String(n); }
@@ -639,7 +737,7 @@
     }
 
     function pointFromCoin(isHeads){
-      return isHeads ? 1 : 2; // HEADS→1(單), TAILS→2(雙)
+      return isHeads ? 1 : 2; // HEADS→1, TAILS→2
     }
 
     function finalizeShakeCoin(){
@@ -728,7 +826,7 @@
           s.appendChild(o);
         });
       });
-      randomCast(); // 預設跑一次（可改成不自動起卦）
+      randomCast(); // 預設跑一次
     }
     init();
   </script>
