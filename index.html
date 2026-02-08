@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>地占雙盤系統 - 卦象修正版（多模式）</title>
+  <title>地占雙盤系統 -（多模式）</title>
   <style>
     :root { --gold: #d4af37; --bg: #1a1a1a; --card: #262626; --text: #eee; }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -17,6 +17,7 @@
     button { background: var(--gold); color: #000; border: none; padding: 10px 12px; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; flex: 1 1 160px; }
     button.alt { background:#444; color:#fff; }
     button.soft { background: rgba(212,175,55,0.18); color: var(--gold); border: 1px solid rgba(212,175,55,0.45); }
+    button.danger { background: rgba(255,80,80,0.18); color: #ffd1d1; border: 1px solid rgba(255,80,80,0.45); }
 
     .mode-box {
       max-width: 520px;
@@ -43,7 +44,12 @@
       user-select: none;
       -webkit-user-select: none;
     }
-    .pad.slide { touch-action: none; } /* 避免滑動被頁面捲動吃掉 */
+    .pad.slide { touch-action: none; }
+    .pad.disabled {
+      opacity: 0.55;
+      filter: grayscale(0.2);
+      border-style: dashed;
+    }
 
     .status-row { margin-top: 10px; color:#bdbdbd; font-size:12px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
     .status-row b { color: var(--gold); }
@@ -161,8 +167,8 @@
       -webkit-user-select: none;
       touch-action: manipulation;
     }
-    .overlay-row { margin-top: 12px; display:flex; gap:8px; }
-    .overlay-row button { flex: 1 1 auto; }
+    .overlay-row { margin-top: 12px; display:flex; gap:8px; flex-wrap:wrap; }
+    .overlay-row button { flex: 1 1 160px; }
 
     @media (max-width: 420px) {
       .controls { padding: 10px; }
@@ -189,7 +195,7 @@
     </div>
   </div>
 
-  <!-- 閉眼點擊起卦（建議） -->
+  <!-- 閉眼點擊起卦 -->
   <div class="mode-box">
     <div class="mode-title">閉眼點擊起卦（16 次：火→風→水→土，四母卦依序）</div>
     <div class="mode-sub">
@@ -206,8 +212,8 @@
   <div class="mode-box">
     <div class="mode-title">搖晃投幣起卦（16 次：火→風→水→土 ×4）</div>
     <div class="mode-sub">
-      點擊「啟用搖晃」後，搖晃手機一次記 1 次投幣，直到 16 次自動定卦。iOS 可能會跳出權限視窗，請允許。
-      <br>規則：<b>HEADS → 1（單）</b>、<b>TAILS → 2（雙）</b>
+      點擊「啟用搖晃」後，搖晃手機一次記 1 次投幣，直到 16 次自動定卦。iOS 可能會跳出權限視窗，請允許。<br>
+      規則：<b>HEADS → 1（單）</b>、<b>TAILS → 2（雙）</b>
     </div>
 
     <div class="coin-wrap">
@@ -230,15 +236,21 @@
     </div>
   </div>
 
-  <!-- 滑動起卦（分段距離取樣，避免整盤同卦） -->
+  <!-- 滑動起卦（加啟動鍵，避免誤觸） -->
   <div class="mode-box">
-    <div class="mode-title">按住滑動起卦（分段距離取樣 → 單/雙）</div>
+    <div class="mode-title">按住滑動起卦（需先啟動）</div>
     <div class="mode-sub">
-      在下方區塊按住並滑動，放開後將路徑切成 16 段，各段距離的奇偶決定點數（避免「總距離」導致整盤同卦）。
+      先按「啟動滑動起卦」，再在下方區塊按住滑動；放開後將路徑切成 16 段，各段距離奇偶決定單/雙。
     </div>
-    <div id="gesturePad" class="pad slide">按住此處並滑動 → 放開即定卦</div>
+
+    <div class="btn-row">
+      <button class="soft" onclick="enableSlideCast()">啟動滑動起卦</button>
+      <button class="danger" onclick="disableSlideCast()">停止/鎖定滑動</button>
+    </div>
+
+    <div id="gesturePad" class="pad slide disabled">（未啟動）請先按「啟動滑動起卦」</div>
     <div class="status-row">
-      <span>狀態：<b id="gStatus">等待</b></span>
+      <span>狀態：<b id="gStatus">鎖定</b></span>
       <span>距離：<b id="gDist">0</b></span>
       <span>段數：<b id="gSeg">0</b>/16</span>
     </div>
@@ -377,13 +389,13 @@
       document.getElementById("h_container").innerHTML = svg;
     }
 
-    /* ---------------- 方式 1：手動指定（保留） ---------------- */
+    /* ---------------- 方式 1：手動指定 ---------------- */
     window.manualCast = function(){
       const getV = (id) => document.getElementById(id).value.split("").map(Number);
       runShield(getV('m1_s'), getV('m2_s'), getV('m3_s'), getV('m4_s'));
     };
 
-    /* ---------------- 方式 2：純隨機（保留） ---------------- */
+    /* ---------------- 方式 2：純隨機 ---------------- */
     window.randomCast = function(){
       const r = () => [1,1,1,1].map(() => Math.floor(Math.random()*2)+1);
       const m1=r(), m2=r(), m3=r(), m4=r();
@@ -391,7 +403,7 @@
       runShield(m1,m2,m3,m4);
     };
 
-    /* ---------------- 方式 3：閉眼點擊起卦（16 taps） ---------------- */
+    /* ---------------- 方式 3：閉眼點擊起卦 ---------------- */
     const overlay = document.getElementById("tapOverlay");
     const tapPad = document.getElementById("tapPad");
     const tapProg = document.getElementById("tapProg");
@@ -458,12 +470,14 @@
       if (tapCount === 16) finalizeTapCast();
     });
 
-    /* ---------------- 方式 4：滑動起卦（分段距離取樣） ---------------- */
+    /* ---------------- 方式 4：滑動起卦（需要啟動鍵） ---------------- */
     (function setupSlideCast(){
       const pad = document.getElementById("gesturePad");
       const gStatus = document.getElementById("gStatus");
       const gDist = document.getElementById("gDist");
       const gSeg = document.getElementById("gSeg");
+
+      let slideEnabled = false;
 
       let down = false;
       let lastX = 0, lastY = 0;
@@ -476,6 +490,14 @@
 
       function hypot(dx,dy){ return Math.hypot(dx,dy); }
       function pointFromDistance(d){ return (Math.floor(d) % 2 === 0) ? 2 : 1; }
+
+      function resetSlideUI(){
+        down = false;
+        totalTravel = 0;
+        increments = [];
+        setGDist(0);
+        setGSeg(0);
+      }
 
       function finalizeSlideCast(){
         const total = Math.max(totalTravel, 80);
@@ -511,6 +533,7 @@
       }
 
       function startSlide(x,y){
+        if (!slideEnabled) return;
         down = true;
         totalTravel = 0;
         increments = [];
@@ -520,7 +543,7 @@
         setGSeg(0);
       }
       function moveSlide(x,y){
-        if(!down) return;
+        if(!slideEnabled || !down) return;
         const d = hypot(x-lastX, y-lastY);
         if (d > 0){
           increments.push(d);
@@ -533,31 +556,56 @@
         setGSeg(est);
       }
       function endSlide(){
-        if(!down) return;
+        if(!slideEnabled || !down) return;
         down = false;
         finalizeSlideCast();
       }
 
+      // Public controls
+      window.enableSlideCast = function(){
+        slideEnabled = true;
+        pad.classList.remove("disabled");
+        pad.textContent = "（已啟動）按住此處並滑動 → 放開即定卦";
+        setGStatus("待操作");
+        resetSlideUI();
+      };
+
+      window.disableSlideCast = function(){
+        slideEnabled = false;
+        pad.classList.add("disabled");
+        pad.textContent = "（未啟動）請先按「啟動滑動起卦」";
+        setGStatus("鎖定");
+        resetSlideUI();
+      };
+
+      // Touch
       pad.addEventListener("touchstart", (e)=>{
+        if (!slideEnabled) return;
         e.preventDefault();
         const t = e.touches[0];
         startSlide(t.clientX, t.clientY);
       }, {passive:false});
 
       pad.addEventListener("touchmove", (e)=>{
+        if (!slideEnabled) return;
         e.preventDefault();
         const t = e.touches[0];
         moveSlide(t.clientX, t.clientY);
       }, {passive:false});
 
       pad.addEventListener("touchend", (e)=>{
+        if (!slideEnabled) return;
         e.preventDefault();
         endSlide();
       }, {passive:false});
 
-      pad.addEventListener("mousedown", (e)=>{ e.preventDefault(); startSlide(e.clientX, e.clientY); });
+      // Mouse
+      pad.addEventListener("mousedown", (e)=>{ if(!slideEnabled) return; e.preventDefault(); startSlide(e.clientX, e.clientY); });
       window.addEventListener("mousemove", (e)=>{ moveSlide(e.clientX, e.clientY); });
       window.addEventListener("mouseup", ()=>{ endSlide(); });
+
+      // default locked
+      window.disableSlideCast();
     })();
 
     /* ---------------- 方式 5：搖晃投幣（含動畫） ---------------- */
