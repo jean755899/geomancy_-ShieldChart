@@ -18,7 +18,6 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { background: var(--bg); color: var(--gold); font-family: "Times New Roman", serif; margin: 0; padding: 10px; text-align: center; }
 
-    /* top bar */
     .topbar{
       max-width: 520px;
       margin: 0 auto 10px;
@@ -99,7 +98,6 @@
     }
     .pill b{ color: var(--gold); }
 
-    /* Question Box */
     .qbox{
       max-width: 520px;
       margin: 0 auto 14px;
@@ -157,7 +155,6 @@
     .qpreview .t{ color: var(--gold); font-weight: bold; margin-bottom: 6px; font-size: 12px; }
     .qpreview .c{ white-space: pre-wrap; font-size: 13px; line-height: 1.45; }
 
-    /* Shake Coin */
     .coin-wrap{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
     .coin{
       width:76px; height:76px; border-radius:50%;
@@ -209,7 +206,6 @@
     .cell { flex: 1 1 0; min-width: 0; border: 0.5px solid #333; padding: 4px 0; display: flex; flex-direction: column; align-items: center; background: #1f1f1f; }
     .idx { font-size: 9px; color: #888; font-weight: bold; }
     .dots { font-size: 10px; line-height: 1.1; color: #f9d342; font-family: monospace; padding: 3px 0; }
-    .name { font-size: 7px; color: #ccc; transform: scale(0.85); white-space: nowrap; margin-top: 2px; font-weight: bold; }
 
     .f15 { width: 85px; background: #333; clip-path: polygon(0 0, 100% 0, 50% 100%); padding-bottom: 18px; border: 1px solid var(--gold); }
     .reconciler-wrap { display: flex; justify-content: center; margin-top: 10px; padding-bottom: 5px; }
@@ -225,7 +221,6 @@
     .footer { margin-top: 30px; padding: 20px 10px; border-top: 1px solid #333; font-size: 12px; color: #888; }
     .footer b { color: var(--gold); }
 
-    /* Tap overlay */
     .overlay {
       position: fixed; inset: 0;
       background: rgba(0,0,0,0.92);
@@ -269,7 +264,6 @@
 </head>
 <body>
 
-  <!-- Top bar: title + language -->
   <div class="topbar">
     <h2 id="ui_title" style="margin:6px 0;">📜 Geomancy Ritual</h2>
     <div class="lang">
@@ -281,7 +275,6 @@
     </div>
   </div>
 
-  <!-- 指定卦象 + Math.random -->
   <div class="controls">
     <div class="select-row">
       <select id="m1_s"></select>
@@ -295,7 +288,6 @@
     </div>
   </div>
 
-  <!-- 閉眼點擊起卦 -->
   <div class="mode-box">
     <div id="ui_tapTitle" class="mode-title">閉眼點擊起卦（16 次：火→風→水→土，四母卦依序）</div>
     <div id="ui_tapDesc" class="mode-sub">
@@ -308,7 +300,6 @@
     </div>
   </div>
 
-  <!-- 搖晃投幣（含動畫） -->
   <div class="mode-box">
     <div id="ui_shakeTitle" class="mode-title">搖晃投幣起卦（16 次：火→風→水→土 ×4）</div>
     <div id="ui_shakeDesc" class="mode-sub">
@@ -336,7 +327,6 @@
     </div>
   </div>
 
-  <!-- 滑動起卦（需先啟動） -->
   <div class="mode-box">
     <div id="ui_slideTitle" class="mode-title">按住滑動起卦（需先啟動）</div>
     <div id="ui_slideDesc" class="mode-sub">
@@ -356,7 +346,6 @@
     </div>
   </div>
 
-  <!-- 問題輸入 -->
   <div class="qbox">
     <label id="ui_qLabel" for="questionInput">問題（可選填）</label>
     <textarea id="questionInput" maxlength="300" placeholder="例如：這段關係接下來三個月的走向？ / 這個合作案是否值得投入？"></textarea>
@@ -387,7 +376,6 @@
     <b>instagram: grove_and_roots</b>
   </div>
 
-  <!-- Tap overlay -->
   <div id="tapOverlay" class="overlay">
     <div class="overlay-card">
       <div id="ui_overlayTitle" class="overlay-title">閉眼點擊起卦</div>
@@ -404,7 +392,6 @@
   </div>
 
   <script>
-    /* ---------------- i18n 字典 ---------------- */
     const I18N = {
       "zh-Hant": {
         langLabel: "語言",
@@ -451,7 +438,8 @@
         slideLocked: "鎖定",
         slideWaiting: "待操作",
         slideCollecting: "收集中…",
-        slideDone: "已定卦"
+        slideDone: "已定卦",
+        POF: "福點"
       },
       "en": {
         langLabel: "Language",
@@ -498,15 +486,41 @@
         slideLocked: "Locked",
         slideWaiting: "Ready",
         slideCollecting: "Collecting…",
-        slideDone: "Cast completed"
+        slideDone: "Cast completed",
+        POF: "Part of Fortune"
       }
     };
 
+    /* 你的中文卦名對照（繁體中文用） */
+    const FIG_ZH = {
+      "Via": "道路",
+      "Populus": "群眾",
+      "Fortuna Major": "大幸運",
+      "Fortuna Minor": "小幸運",
+      "Conjunctio": "結合",
+      "Albus": "白色",
+      "Carcer": "限制",
+      "Caput Draconis": "龍頭",
+      "Rubeus": "紅色",
+      "Acquisitio": "獲得",
+      "Cauda": "龍尾",          // 你的程式裡名稱是 "Cauda"
+      "Cauda Draconis": "龍尾", // 若未來你改成全名也能用
+      "Amissio": "失去",
+      "Puella": "女子",
+      "Tristitia": "悲傷",
+      "Puer": "男子",
+      "Laetitia": "大快樂"
+    };
+
     function setText(id, html){ const el=document.getElementById(id); if(el) el.innerHTML = html; }
-    function setValue(id, v){ const el=document.getElementById(id); if(el) el.value = v; }
     function setPlaceholder(id, v){ const el=document.getElementById(id); if(el) el.placeholder = v; }
 
     let currentLang = "zh-Hant";
+
+    function displayFigureName(enName){
+      if (currentLang === "zh-Hant") return (FIG_ZH[enName] || enName);
+      return enName;
+    }
 
     function applyLang(lang){
       currentLang = lang;
@@ -514,7 +528,6 @@
 
       setText("ui_langLabel", t.langLabel);
       setText("ui_title", t.title);
-
       setText("ui_btnManual", t.btnManual);
       setText("ui_btnRandom", t.btnRandom);
 
@@ -536,10 +549,6 @@
       setText("ui_btnSlideEnable", t.btnSlideEnable);
       setText("ui_btnSlideDisable", t.btnSlideDisable);
 
-      setText("ui_gStatusLabel", t.gStatus + "<b id='gStatus'>" + document.getElementById("gStatus").textContent + "</b>");
-      setText("ui_gDistLabel", t.gDist + "<b id='gDist'>" + document.getElementById("gDist").textContent + "</b>");
-      setText("ui_gSegLabel", t.gSeg + "<b id='gSeg'>" + document.getElementById("gSeg").textContent + "</b>/16");
-
       setText("ui_qLabel", t.qLabel);
       setPlaceholder("questionInput", t.qPlaceholder);
       setText("ui_qCountLabel", t.qCountLabel);
@@ -554,19 +563,19 @@
       setText("ui_overlayReset", t.overlayReset);
       document.getElementById("tapPad").textContent = t.overlayPad;
 
-      // update dynamic status labels
-      if (!shakeEnabled) document.getElementById("shakeStatus").textContent = t.shakeNotEnabled;
-
-      // update slide pad text according to state
+      // slide pad text sync
       const pad = document.getElementById("gesturePad");
       if (pad.classList.contains("disabled")) pad.textContent = t.slidePadLocked;
       else pad.textContent = t.slidePadEnabled;
 
       localStorage.setItem("geomancy_lang", lang);
       document.documentElement.lang = (lang === "en") ? "en" : "zh-Hant";
+
+      // 重新渲染下拉選單顯示文字（不改 value）
+      populateSelects(true);
     }
 
-    /* ---------------- 卦象定義 ---------------- */
+    /* 卦象定義（維持英文識別 + code） */
     const figureList = [
       {name:"Via",code:"1111"}, {name:"Populus",code:"2222"},
       {name:"Conjunctio",code:"2112"}, {name:"Carcer",code:"1221"},
@@ -578,23 +587,20 @@
       {name:"Acquisitio",code:"2121"}, {name:"Amissio",code:"1212"},
       {name:"Tristitia",code:"2221"}, {name:"Laetitia",code:"1222"}
     ];
-    const figureNames = {};
-    figureList.forEach(f => figureNames[f.code] = f.name);
 
     function add(f1,f2){ return f1.map((v,i)=>v===f2[i]?2:1); }
     function renderDotsStr(fig){ return fig.map(v=>v===1?"●":"● ●"); }
 
+    /* 盾盤 cell：取消卦名顯示（你要求的） */
     function createCell(fig, idx, className=""){
-      const code = fig.join("");
       const dots = renderDotsStr(fig).join("<br>");
       return `<div class="cell ${className}">
         <div class="idx">${idx}</div>
         <div class="dots">${dots}</div>
-        <div class="name">${figureNames[code] || "Unknown"}</div>
       </div>`;
     }
 
-    /* ---------------- 問題輸入 ---------------- */
+    /* 問題輸入 */
     const qInput = document.getElementById("questionInput");
     const qCount = document.getElementById("qCount");
     const qPreview = document.getElementById("questionPreview");
@@ -615,7 +621,7 @@
     qInput.addEventListener("input", ()=>{ updateQuestionCount(); });
     updateQuestionCount();
 
-    /* ---------------- 盾盤/雙盤計算 ---------------- */
+    /* 雙盤計算 */
     function runShield(m1,m2,m3,m4){
       let d5=[m1[0],m2[0],m3[0],m4[0]],
           d6=[m1[1],m2[1],m3[1],m4[1]],
@@ -638,7 +644,7 @@
       renderQuestionPreview();
     }
 
-    /* ---------------- 12 宮位：只顯示卦象點型 ---------------- */
+    /* 12 宮位：只顯示點型（不顯示卦名、不顯示宮位數字） */
     function renderHouseSVG(all){
       const size=320, mid=160, iStart=82, iEnd=238;
 
@@ -670,7 +676,7 @@
         <line x1="5" y1="315" x2="${iStart}" y2="${iEnd}" class="line"/>
         <line x1="315" y1="315" x2="${iEnd}" y2="${iEnd}" class="line"/>
         <text x="${mid}" y="${mid-15}" class="h-meta" text-anchor="middle">SOUL</text>
-        <text x="${mid}" y="${mid+8}" class="h-meta" text-anchor="middle">${(currentLang==="en")?"Part of Fortune":"福點"}：${pars}</text>
+        <text x="${mid}" y="${mid+8}" class="h-meta" text-anchor="middle">${t.POF}：${pars}</text>
         <text x="${mid}" y="${mid+25}" class="h-meta" text-anchor="middle">index：${idxP}</text>`;
 
       for(let i=1;i<=12;i++){
@@ -690,13 +696,38 @@
       document.getElementById("h_container").innerHTML = svg;
     }
 
-    /* ---------------- 方式 1：手動指定 ---------------- */
+    /* 下拉選單：繁中顯示中文卦名，英文顯示英文卦名 */
+    function populateSelects(keepSelected){
+      const ids = ['m1_s','m2_s','m3_s','m4_s'];
+      const prev = {};
+      if (keepSelected){
+        ids.forEach(id => prev[id] = document.getElementById(id).value);
+      }
+
+      const sorted = figureList.slice().sort((a,b)=>{
+        const an = displayFigureName(a.name);
+        const bn = displayFigureName(b.name);
+        return an.localeCompare(bn, currentLang === "en" ? "en" : "zh-Hant");
+      });
+
+      ids.forEach(id=>{
+        const s=document.getElementById(id);
+        s.innerHTML="";
+        sorted.forEach(f=>{
+          const o=document.createElement("option");
+          o.value=f.code;
+          o.text = displayFigureName(f.name);
+          s.appendChild(o);
+        });
+        if (keepSelected && prev[id]) s.value = prev[id];
+      });
+    }
+
     window.manualCast = function(){
       const getV = (id) => document.getElementById(id).value.split("").map(Number);
       runShield(getV('m1_s'), getV('m2_s'), getV('m3_s'), getV('m4_s'));
     };
 
-    /* ---------------- 方式 2：純隨機 ---------------- */
     window.randomCast = function(){
       const r = () => [1,1,1,1].map(() => Math.floor(Math.random()*2)+1);
       const m1=r(), m2=r(), m3=r(), m4=r();
@@ -704,7 +735,7 @@
       runShield(m1,m2,m3,m4);
     };
 
-    /* ---------------- 方式 3：閉眼點擊起卦 ---------------- */
+    /* 閉眼點擊起卦 */
     const overlay = document.getElementById("tapOverlay");
     const tapPad = document.getElementById("tapPad");
     const tapProg = document.getElementById("tapProg");
@@ -773,7 +804,7 @@
       if (tapCount === 16) finalizeTapCast();
     });
 
-    /* ---------------- 方式 4：滑動起卦（需先啟動） ---------------- */
+    /* 滑動起卦（需先啟動） */
     (function setupSlideCast(){
       const pad = document.getElementById("gesturePad");
       const gStatus = document.getElementById("gStatus");
@@ -907,7 +938,7 @@
       window.disableSlideCast();
     })();
 
-    /* ---------------- 方式 5：搖晃投幣（含動畫） ---------------- */
+    /* 搖晃投幣（含動畫） */
     const coinEl = document.getElementById("coin");
     const shakeStatusEl = document.getElementById("shakeStatus");
     const shakeProgEl = document.getElementById("shakeProg");
@@ -1014,35 +1045,26 @@
       setShakeStatus((I18N[currentLang]||I18N["zh-Hant"]).shakeStopped);
     };
 
-    /* ---------------- init ---------------- */
+    /* init */
     function init(){
-      ['m1_s','m2_s','m3_s','m4_s'].forEach(id=>{
-        const s=document.getElementById(id);
-        s.innerHTML="";
-        figureList.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(f=>{
-          const o=document.createElement("option");
-          o.value=f.code; o.text=f.name;
-          s.appendChild(o);
-        });
-      });
+      // populate selects first
+      populateSelects(false);
 
-      const saved = localStorage.getItem("geomancy_lang");
       const langSelect = document.getElementById("langSelect");
+      const saved = localStorage.getItem("geomancy_lang");
       if (saved && (saved==="en" || saved==="zh-Hant")) langSelect.value = saved;
 
       applyLang(langSelect.value);
 
       langSelect.addEventListener("change", ()=>{
         applyLang(langSelect.value);
-        // 重新渲染 12 宮位中心文字（福點/Part of Fortune）
-        // 若尚未起卦，先不動；若已起卦，會在下一次 runShield 時更新
-        // 這裡直接用目前下拉選擇重新跑一次手動計算（不改卦）
+        // 保持目前選取的四母卦，直接重算（不改卦）
         const getV = (id) => document.getElementById(id).value.split("").map(Number);
         runShield(getV('m1_s'), getV('m2_s'), getV('m3_s'), getV('m4_s'));
-        // Overlay狀態文字同步
         tapStage.textContent = stageLabel(tapCount);
       });
 
+      // 初始隨機
       randomCast();
     }
     init();
