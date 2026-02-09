@@ -218,8 +218,9 @@
     .h-dots { fill: #f9d342; font-size: 10.5px; font-family: monospace; text-anchor: middle; }
     .h-meta { fill: var(--gold); font-size: 9px; font-weight: bold; }
 
-    .footer { margin-top: 30px; padding: 20px 10px; border-top: 1px solid #333; font-size: 12px; color: #888; }
+    .footer { margin-top: 30px; padding: 20px 10px; border-top: 1px solid #333; font-size: 12px; color: #888; line-height: 1.6; }
     .footer b { color: var(--gold); }
+    .footer a { color: var(--gold); text-decoration: none; border-bottom: 1px solid rgba(212,175,55,0.3); }
 
     .overlay {
       position: fixed; inset: 0;
@@ -372,20 +373,7 @@
   <div id="h_container" class="house-svg-container"></div>
 
   <div id="ui_footer" class="footer">
-  如有任何問題與意見回饋，請與我聯繫<br><br>
-
-  <b>Instagram：</b><br>
-  <a href="https://www.instagram.com/grove_hellenism?igsh=dnNyOTdsYm03eGly&utm_source=qr"
-     target="_blank" rel="noopener noreferrer">
-    https://www.instagram.com/grove_hellenism
-  </a><br>
-  <a href="https://www.instagram.com/grove_and_roots?igsh=MTgzaDhzcW82d2Q1Mw=="
-     target="_blank" rel="noopener noreferrer">
-    https://www.instagram.com/grove_and_roots
-  </a><br><br>
-
-  如果你需要專業、詳盡的解讀，也可以將結果截圖後私訊我。
-</div>
+    </div>
 
   <div id="tapOverlay" class="overlay">
     <div class="overlay-card">
@@ -435,7 +423,15 @@
         qHint: "提示：起卦後會顯示在結果上方",
         qPreviewTitle: "本次問題",
         houseTitle: "🏛️ House Chart",
-        footer: '如有任何問題與意見回饋，請與我聯繫<br><b>instagram: grove_and_roots</b>',
+        footer: `如有任何問題與意見回饋，請與我聯繫<br><br>
+          <b>Instagram：</b><br>
+          <a href="https://www.instagram.com/grove_hellenism?igsh=dnNyOTdsYm03eGly&utm_source=qr" target="_blank" rel="noopener noreferrer">
+            https://www.instagram.com/grove_hellenism
+          </a><br>
+          <a href="https://www.instagram.com/grove_and_roots?igsh=MTgzaDhzcW82d2Q1Mw==" target="_blank" rel="noopener noreferrer">
+            https://www.instagram.com/grove_and_roots
+          </a><br><br>
+          如果你需要專業、詳盡的解讀，也可以將結果截圖後私訊我。`,
         overlayTitle: "閉眼點擊起卦",
         overlayCancel: "取消",
         overlayReset: "重置進度",
@@ -483,7 +479,11 @@
         qHint: "Tip: shown above results after casting",
         qPreviewTitle: "Question",
         houseTitle: "🏛️ House Chart",
-        footer: 'For feedback, contact me<br><b>instagram: grove_and_roots</b>',
+        footer: `For feedback, contact me<br><br>
+          <b>Instagram:</b><br>
+          <a href="https://www.instagram.com/grove_hellenism" target="_blank">@grove_hellenism</a><br>
+          <a href="https://www.instagram.com/grove_and_roots" target="_blank">@grove_and_roots</a><br><br>
+          For professional reading, screenshot the result and DM me.`,
         overlayTitle: "Eyes-closed Tap Casting",
         overlayCancel: "Cancel",
         overlayReset: "Reset",
@@ -514,8 +514,8 @@
       "Caput Draconis": "龍頭",
       "Rubeus": "紅色",
       "Acquisitio": "獲得",
-      "Cauda": "龍尾",          // 你的程式裡名稱是 "Cauda"
-      "Cauda Draconis": "龍尾", // 若未來你改成全名也能用
+      "Cauda": "龍尾",
+      "Cauda Draconis": "龍尾",
       "Amissio": "失去",
       "Puella": "女子",
       "Tristitia": "悲傷",
@@ -574,19 +574,16 @@
       setText("ui_overlayReset", t.overlayReset);
       document.getElementById("tapPad").textContent = t.overlayPad;
 
-      // slide pad text sync
       const pad = document.getElementById("gesturePad");
       if (pad.classList.contains("disabled")) pad.textContent = t.slidePadLocked;
       else pad.textContent = t.slidePadEnabled;
 
       localStorage.setItem("geomancy_lang", lang);
       document.documentElement.lang = (lang === "en") ? "en" : "zh-Hant";
-
-      // 重新渲染下拉選單顯示文字（不改 value）
       populateSelects(true);
     }
 
-    /* 卦象定義（維持英文識別 + code） */
+    /* 卦象定義 (女子: 1211, 男子: 1121) */
     const figureList = [
       {name:"Via",code:"1111"}, {name:"Populus",code:"2222"},
       {name:"Conjunctio",code:"2112"}, {name:"Carcer",code:"1221"},
@@ -602,7 +599,6 @@
     function add(f1,f2){ return f1.map((v,i)=>v===f2[i]?2:1); }
     function renderDotsStr(fig){ return fig.map(v=>v===1?"●":"● ●"); }
 
-    /* 盾盤 cell：取消卦名顯示（你要求的） */
     function createCell(fig, idx, className=""){
       const dots = renderDotsStr(fig).join("<br>");
       return `<div class="cell ${className}">
@@ -611,7 +607,6 @@
       </div>`;
     }
 
-    /* 問題輸入 */
     const qInput = document.getElementById("questionInput");
     const qCount = document.getElementById("qCount");
     const qPreview = document.getElementById("questionPreview");
@@ -632,7 +627,6 @@
     qInput.addEventListener("input", ()=>{ updateQuestionCount(); });
     updateQuestionCount();
 
-    /* 雙盤計算 */
     function runShield(m1,m2,m3,m4){
       let d5=[m1[0],m2[0],m3[0],m4[0]],
           d6=[m1[1],m2[1],m3[1],m4[1]],
@@ -642,94 +636,52 @@
           n11=add(d5,d6), n12=add(d7,d8),
           w13=add(n9,n10), w14=add(n11,n12),
           j15=add(w13,w14), r16=add(m1,j15);
-
       const all=[null,m1,m2,m3,m4,d5,d6,d7,d8,n9,n10,n11,n12,w13,w14,j15,r16];
-
       document.getElementById("s_row1").innerHTML = [8,7,6,5,4,3,2,1].map(i=>createCell(all[i],i)).join("");
       document.getElementById("s_row2").innerHTML = [12,11,10,9].map(i=>createCell(all[i],i)).join("");
       document.getElementById("s_row3").innerHTML = [14,13].map(i=>createCell(all[i],i)).join("");
       document.getElementById("s_row4").innerHTML = createCell(all[15],15,"f15");
       document.getElementById("s_row5").innerHTML = createCell(all[16],16,"f16");
-
       renderHouseSVG(all);
       renderQuestionPreview();
     }
 
-    /* 12 宮位：只顯示點型（不顯示卦名、不顯示宮位數字） */
     function renderHouseSVG(all){
       const size=320, mid=160, iStart=82, iEnd=238;
-
       let tp=0, sp=0;
       for(let i=1;i<=12;i++){ all[i].forEach(p=>{ tp+=p; if(p===1) sp++; }); }
       const pars=(tp%12)||12, idxP=(sp%12)||12;
-
-      const baseCenters={
-        1:[52,160],  2:[42,242],  3:[78,281],  4:[160,275],
-        5:[242,281], 6:[272,242], 7:[268,160], 8:[272,72],
-        9:[242,39], 10:[160,45], 11:[78,39],  12:[48,72]
-      };
-
+      const baseCenters={ 1:[52,160], 2:[42,242], 3:[78,281], 4:[160,275], 5:[242,281], 6:[272,242], 7:[268,160], 8:[272,72], 9:[242,39], 10:[160,45], 11:[78,39], 12:[48,72] };
       const OUT = 1.03;
       const centers = {};
-      for (let i=1;i<=12;i++){
-        const [x,y]=baseCenters[i];
-        centers[i]=[ mid + (x-mid)*OUT, mid + (y-mid)*OUT ];
-      }
-
+      for (let i=1;i<=12;i++){ const [x,y]=baseCenters[i]; centers[i]=[ mid + (x-mid)*OUT, mid + (y-mid)*OUT ]; }
       const t = I18N[currentLang] || I18N["zh-Hant"];
-
       let svg=`<svg viewBox="0 0 ${size} ${size}">
         <rect x="5" y="5" width="310" height="310" class="line"/>
         <polygon points="${mid},5 315,${mid} ${mid},315 5,${mid}" class="line"/>
         <rect x="${iStart}" y="${iStart}" width="156" height="156" class="line"/>
-        <line x1="5" y1="5" x2="${iStart}" y2="${iStart}" class="line"/>
-        <line x1="315" y1="5" x2="${iEnd}" y2="${iStart}" class="line"/>
-        <line x1="5" y1="315" x2="${iStart}" y2="${iEnd}" class="line"/>
-        <line x1="315" y1="315" x2="${iEnd}" y2="${iEnd}" class="line"/>
+        <line x1="5" y1="5" x2="${iStart}" y2="${iStart}" class="line"/><line x1="315" y1="5" x2="${iEnd}" y2="${iStart}" class="line"/><line x1="5" y1="315" x2="${iStart}" y2="${iEnd}" class="line"/><line x1="315" y1="315" x2="${iEnd}" y2="${iEnd}" class="line"/>
         <text x="${mid}" y="${mid-15}" class="h-meta" text-anchor="middle">SOUL</text>
         <text x="${mid}" y="${mid+8}" class="h-meta" text-anchor="middle">${t.POF}：${pars}</text>
         <text x="${mid}" y="${mid+25}" class="h-meta" text-anchor="middle">index：${idxP}</text>`;
-
       for(let i=1;i<=12;i++){
-        const [cx,cy]=centers[i];
-        const dots=renderDotsStr(all[i]);
-        svg+=`<g transform="translate(${cx},${cy})">
-          <g transform="translate(0,-4)">
-            <text y="-10" class="h-dots">${dots[0]}</text>
-            <text y="0" class="h-dots">${dots[1]}</text>
-            <text y="10" class="h-dots">${dots[2]}</text>
-            <text y="20" class="h-dots">${dots[3]}</text>
-          </g>
-        </g>`;
+        const [cx,cy]=centers[i]; const dots=renderDotsStr(all[i]);
+        svg+=`<g transform="translate(${cx},${cy})"><g transform="translate(0,-4)"><text y="-10" class="h-dots">${dots[0]}</text><text y="0" class="h-dots">${dots[1]}</text><text y="10" class="h-dots">${dots[2]}</text><text y="20" class="h-dots">${dots[3]}</text></g></g>`;
       }
-
       svg+=`</svg>`;
       document.getElementById("h_container").innerHTML = svg;
     }
 
-    /* 下拉選單：繁中顯示中文卦名，英文顯示英文卦名 */
     function populateSelects(keepSelected){
       const ids = ['m1_s','m2_s','m3_s','m4_s'];
-      const prev = {};
-      if (keepSelected){
-        ids.forEach(id => prev[id] = document.getElementById(id).value);
-      }
-
+      const prev = {}; if (keepSelected){ ids.forEach(id => prev[id] = document.getElementById(id).value); }
       const sorted = figureList.slice().sort((a,b)=>{
-        const an = displayFigureName(a.name);
-        const bn = displayFigureName(b.name);
+        const an = displayFigureName(a.name); const bn = displayFigureName(b.name);
         return an.localeCompare(bn, currentLang === "en" ? "en" : "zh-Hant");
       });
-
       ids.forEach(id=>{
-        const s=document.getElementById(id);
-        s.innerHTML="";
-        sorted.forEach(f=>{
-          const o=document.createElement("option");
-          o.value=f.code;
-          o.text = displayFigureName(f.name);
-          s.appendChild(o);
-        });
+        const s=document.getElementById(id); s.innerHTML="";
+        sorted.forEach(f=>{ const o=document.createElement("option"); o.value=f.code; o.text = displayFigureName(f.name); s.appendChild(o); });
         if (keepSelected && prev[id]) s.value = prev[id];
       });
     }
@@ -746,21 +698,15 @@
       runShield(m1,m2,m3,m4);
     };
 
-    /* 閉眼點擊起卦 */
     const overlay = document.getElementById("tapOverlay");
     const tapPad = document.getElementById("tapPad");
     const tapProg = document.getElementById("tapProg");
     const tapStage = document.getElementById("tapStage");
-
-    let tapCount = 0;
-    let tapPoints = [];
-    let lastTapT = 0;
-    const elemNames = ["火","風","水","土"];
-    const elemNamesEN = ["Fire","Air","Water","Earth"];
+    let tapCount = 0; let tapPoints = []; let lastTapT = 0;
+    const elemNames = ["火","風","水","土"]; const elemNamesEN = ["Fire","Air","Water","Earth"];
 
     function stageLabel(n){
-      const mother = Math.floor(n/4)+1;
-      const idx = n%4;
+      const mother = Math.floor(n/4)+1; const idx = n%4;
       if (currentLang === "en") return `Mother ${mother} / ${elemNamesEN[idx]}`;
       return `第 ${mother} 母卦／${elemNames[idx]}`;
     }
@@ -769,313 +715,110 @@
       const mix = (dt * 7) + (x * 3) + (y * 5) + (ts % 997);
       return (Math.abs(Math.floor(mix)) % 2 === 0) ? 2 : 1;
     }
-
-    window.startTapCast = function(){
-      overlay.style.display = "flex";
-      resetTapCast();
-    };
+    window.startTapCast = function(){ overlay.style.display = "flex"; resetTapCast(); };
     window.cancelTapCast = function(){ overlay.style.display = "none"; };
     window.resetTapCast = function(){
-      tapCount = 0; tapPoints = []; lastTapT = 0;
-      tapProg.textContent = "0";
-      tapStage.textContent = stageLabel(0);
-      tapPad.textContent = (I18N[currentLang]||I18N["zh-Hant"]).overlayPad;
+      tapCount = 0; tapPoints = []; lastTapT = 0; tapProg.textContent = "0";
+      tapStage.textContent = stageLabel(0); tapPad.textContent = (I18N[currentLang]||I18N["zh-Hant"]).overlayPad;
     };
-
     function finalizeTapCast(){
-      const m1 = tapPoints.slice(0,4);
-      const m2 = tapPoints.slice(4,8);
-      const m3 = tapPoints.slice(8,12);
-      const m4 = tapPoints.slice(12,16);
-
+      const m1 = tapPoints.slice(0,4); const m2 = tapPoints.slice(4,8);
+      const m3 = tapPoints.slice(8,12); const m4 = tapPoints.slice(12,16);
       m1_s.value=m1.join(""); m2_s.value=m2.join(""); m3_s.value=m3.join(""); m4_s.value=m4.join("");
       runShield(m1,m2,m3,m4);
-
       tapPad.textContent = (I18N[currentLang]||I18N["zh-Hant"]).overlayDone;
-      overlay.style.display = "none";
+      setTimeout(()=>overlay.style.display = "none", 400);
     }
-
     tapPad.addEventListener("click", (e)=>{
       if (tapCount >= 16) return;
-
-      const rect = tapPad.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const rect = tapPad.getBoundingClientRect(); const x = e.clientX - rect.left; const y = e.clientY - rect.top;
       const ts = (typeof performance !== "undefined" ? performance.now() : Date.now());
-
-      const p = pointFromTap(ts, x, y);
-      tapPoints.push(p);
-      lastTapT = ts;
-
-      tapCount++;
-      tapProg.textContent = String(tapCount);
-      if (tapCount < 16) tapStage.textContent = stageLabel(tapCount);
+      const p = pointFromTap(ts, x, y); tapPoints.push(p); lastTapT = ts; tapCount++;
+      tapProg.textContent = String(tapCount); if (tapCount < 16) tapStage.textContent = stageLabel(tapCount);
       tapPad.textContent = (currentLang==="en") ? `Tapped ${tapCount}/16` : `已點擊 ${tapCount}/16`;
-
       if (tapCount === 16) finalizeTapCast();
     });
 
-    /* 滑動起卦（需先啟動） */
     (function setupSlideCast(){
-      const pad = document.getElementById("gesturePad");
-      const gStatus = document.getElementById("gStatus");
-      const gDist = document.getElementById("gDist");
-      const gSeg = document.getElementById("gSeg");
-
-      let slideEnabled = false;
-
-      let down = false;
-      let lastX = 0, lastY = 0;
-      let totalTravel = 0;
-      let increments = [];
-
+      const pad = document.getElementById("gesturePad"); const gStatus = document.getElementById("gStatus");
+      const gDist = document.getElementById("gDist"); const gSeg = document.getElementById("gSeg");
+      let slideEnabled = false; let down = false; let lastX = 0, lastY = 0; let totalTravel = 0; let increments = [];
       function setGStatus(t){ gStatus.textContent = t; }
       function setGDist(v){ gDist.textContent = String(Math.round(v)); }
       function setGSeg(v){ gSeg.textContent = String(v); }
-
-      function hypot(dx,dy){ return Math.hypot(dx,dy); }
       function pointFromDistance(d){ return (Math.floor(d) % 2 === 0) ? 2 : 1; }
-
-      function resetSlideUI(){
-        down = false;
-        totalTravel = 0;
-        increments = [];
-        setGDist(0);
-        setGSeg(0);
-      }
-
       function finalizeSlideCast(){
-        const total = Math.max(totalTravel, 80);
-        const target = total / 16;
-
-        let segVals = [];
-        let acc = 0;
-        let made = 0;
-
+        const total = Math.max(totalTravel, 80); const target = total / 16;
+        let segVals = []; let acc = 0; let made = 0;
         for (let i=0; i<increments.length && made<16; i++){
-          acc += increments[i];
-          if (acc >= target){
-            segVals.push(pointFromDistance(acc * 13 + (i*17)));
-            made++;
-            acc = 0;
-          }
+          acc += increments[i]; if (acc >= target){ segVals.push(pointFromDistance(acc * 13 + (i*17))); made++; acc = 0; }
         }
         while (segVals.length < 16){
           const t = (typeof performance !== "undefined" ? performance.now() : Date.now());
           segVals.push(pointFromDistance((total + segVals.length*31 + t)));
         }
-
-        const m1 = segVals.slice(0,4);
-        const m2 = segVals.slice(4,8);
-        const m3 = segVals.slice(8,12);
-        const m4 = segVals.slice(12,16);
-
+        const m1 = segVals.slice(0,4); const m2 = segVals.slice(4,8);
+        const m3 = segVals.slice(8,12); const m4 = segVals.slice(12,16);
         m1_s.value=m1.join(""); m2_s.value=m2.join(""); m3_s.value=m3.join(""); m4_s.value=m4.join("");
         runShield(m1,m2,m3,m4);
-
-        setGStatus((I18N[currentLang]||I18N["zh-Hant"]).slideDone);
-        setGSeg(16);
+        setGStatus((I18N[currentLang]||I18N["zh-Hant"]).slideDone); setGSeg(16);
       }
-
-      function startSlide(x,y){
-        if (!slideEnabled) return;
-        down = true;
-        totalTravel = 0;
-        increments = [];
-        lastX = x; lastY = y;
-        setGStatus((I18N[currentLang]||I18N["zh-Hant"]).slideCollecting);
-        setGDist(0);
-        setGSeg(0);
-      }
+      function startSlide(x,y){ if (!slideEnabled) return; down = true; totalTravel = 0; increments = []; lastX = x; lastY = y; setGStatus((I18N[currentLang]||I18N["zh-Hant"]).slideCollecting); }
       function moveSlide(x,y){
-        if(!slideEnabled || !down) return;
-        const d = hypot(x-lastX, y-lastY);
-        if (d > 0){
-          increments.push(d);
-          totalTravel += d;
-        }
-        lastX = x; lastY = y;
-        setGDist(totalTravel);
-
-        const est = Math.min(16, Math.floor((totalTravel / Math.max(totalTravel,80)) * 16));
-        setGSeg(est);
+        if(!slideEnabled || !down) return; const d = Math.hypot(x-lastX, y-lastY);
+        if (d > 0){ increments.push(d); totalTravel += d; }
+        lastX = x; lastY = y; setGDist(totalTravel);
+        const est = Math.min(16, Math.floor((totalTravel / Math.max(totalTravel,80)) * 16)); setGSeg(est);
       }
-      function endSlide(){
-        if(!slideEnabled || !down) return;
-        down = false;
-        finalizeSlideCast();
-      }
-
-      window.enableSlideCast = function(){
-        slideEnabled = true;
-        pad.classList.remove("disabled");
-        pad.textContent = (I18N[currentLang]||I18N["zh-Hant"]).slidePadEnabled;
-        setGStatus((I18N[currentLang]||I18N["zh-Hant"]).slideWaiting);
-        resetSlideUI();
-      };
-
-      window.disableSlideCast = function(){
-        slideEnabled = false;
-        pad.classList.add("disabled");
-        pad.textContent = (I18N[currentLang]||I18N["zh-Hant"]).slidePadLocked;
-        setGStatus((I18N[currentLang]||I18N["zh-Hant"]).slideLocked);
-        resetSlideUI();
-      };
-
-      pad.addEventListener("touchstart", (e)=>{
-        if (!slideEnabled) return;
-        e.preventDefault();
-        const t = e.touches[0];
-        startSlide(t.clientX, t.clientY);
-      }, {passive:false});
-
-      pad.addEventListener("touchmove", (e)=>{
-        if (!slideEnabled) return;
-        e.preventDefault();
-        const t = e.touches[0];
-        moveSlide(t.clientX, t.clientY);
-      }, {passive:false});
-
-      pad.addEventListener("touchend", (e)=>{
-        if (!slideEnabled) return;
-        e.preventDefault();
-        endSlide();
-      }, {passive:false});
-
+      window.enableSlideCast = function(){ slideEnabled = true; pad.classList.remove("disabled"); pad.textContent = (I18N[currentLang]||I18N["zh-Hant"]).slidePadEnabled; setGStatus((I18N[currentLang]||I18N["zh-Hant"]).slideWaiting); };
+      window.disableSlideCast = function(){ slideEnabled = false; pad.classList.add("disabled"); pad.textContent = (I18N[currentLang]||I18N["zh-Hant"]).slidePadLocked; setGStatus((I18N[currentLang]||I18N["zh-Hant"]).slideLocked); };
+      pad.addEventListener("touchstart", (e)=>{ if (!slideEnabled) return; e.preventDefault(); const t = e.touches[0]; startSlide(t.clientX, t.clientY); }, {passive:false});
+      pad.addEventListener("touchmove", (e)=>{ if (!slideEnabled) return; e.preventDefault(); const t = e.touches[0]; moveSlide(t.clientX, t.clientY); }, {passive:false});
+      pad.addEventListener("touchend", (e)=>{ if(!slideEnabled || !down) return; e.preventDefault(); down=false; finalizeSlideCast(); }, {passive:false});
       pad.addEventListener("mousedown", (e)=>{ if(!slideEnabled) return; e.preventDefault(); startSlide(e.clientX, e.clientY); });
       window.addEventListener("mousemove", (e)=>{ moveSlide(e.clientX, e.clientY); });
-      window.addEventListener("mouseup", ()=>{ endSlide(); });
-
+      window.addEventListener("mouseup", ()=>{ if(down){ down=false; finalizeSlideCast(); } });
       window.disableSlideCast();
     })();
 
-    /* 搖晃投幣（含動畫） */
-    const coinEl = document.getElementById("coin");
-    const shakeStatusEl = document.getElementById("shakeStatus");
-    const shakeProgEl = document.getElementById("shakeProg");
-    const shakeLastEl = document.getElementById("shakeLast");
-
-    let shakeEnabled = false;
-    let shakePoints = [];
-    let lastShakeTime = 0;
-
-    const SHAKE_THRESHOLD = 15;
-    const SHAKE_COOLDOWN_MS = 550;
-
-    function setShakeStatus(t){ shakeStatusEl.textContent = t; }
-    function setShakeProg(n){ shakeProgEl.textContent = String(n); }
-    function setShakeLast(t){ shakeLastEl.textContent = t; }
-
-    function resetShakeCoin(){
-      shakePoints = [];
-      lastShakeTime = 0;
-      setShakeProg(0);
-      setShakeLast("—");
-    }
-
-    function coinFlipAnimation(isHeads){
-      coinEl.classList.remove("flip-heads","flip-tails");
-      void coinEl.offsetWidth;
-      coinEl.classList.add(isHeads ? "flip-heads" : "flip-tails");
-    }
-
-    function pointFromCoin(isHeads){
-      return isHeads ? 1 : 2;
-    }
-
+    const coinEl = document.getElementById("coin"); const shakeStatusEl = document.getElementById("shakeStatus");
+    const shakeProgEl = document.getElementById("shakeProg"); const shakeLastEl = document.getElementById("shakeLast");
+    let shakeEnabled = false; let shakePoints = []; let lastShakeTime = 0;
+    const SHAKE_THRESHOLD = 15; const SHAKE_COOLDOWN_MS = 550;
     function finalizeShakeCoin(){
-      const m1 = shakePoints.slice(0,4);
-      const m2 = shakePoints.slice(4,8);
-      const m3 = shakePoints.slice(8,12);
-      const m4 = shakePoints.slice(12,16);
-
+      const m1 = shakePoints.slice(0,4); const m2 = shakePoints.slice(4,8);
+      const m3 = shakePoints.slice(8,12); const m4 = shakePoints.slice(12,16);
       m1_s.value=m1.join(""); m2_s.value=m2.join(""); m3_s.value=m3.join(""); m4_s.value=m4.join("");
       runShield(m1,m2,m3,m4);
-
-      setShakeStatus((I18N[currentLang]||I18N["zh-Hant"]).shakeDone);
-      shakeEnabled = false;
-      window.removeEventListener("devicemotion", onDeviceMotion, {passive:true});
+      shakeStatusEl.textContent = (I18N[currentLang]||I18N["zh-Hant"]).shakeDone;
+      shakeEnabled = false; window.removeEventListener("devicemotion", onDeviceMotion);
     }
-
-    function decideHeadsFromMotion(mag){
-      const t = (typeof performance !== "undefined" ? performance.now() : Date.now());
-      const mix = Math.floor(mag * 1000 + t * 17);
-      return (mix % 2) === 0;
-    }
-
     function onDeviceMotion(e){
-      if (!shakeEnabled) return;
-
-      const now = Date.now();
-      if (now - lastShakeTime < SHAKE_COOLDOWN_MS) return;
-
-      const acc = e.accelerationIncludingGravity || e.acceleration;
-      if (!acc) return;
-
-      const ax = acc.x || 0, ay = acc.y || 0, az = acc.z || 0;
-      const mag = Math.sqrt(ax*ax + ay*ay + az*az);
-
-      if (mag < SHAKE_THRESHOLD) return;
-
-      lastShakeTime = now;
-
-      const isHeads = decideHeadsFromMotion(mag);
-      coinFlipAnimation(isHeads);
-
-      const p = pointFromCoin(isHeads);
-      shakePoints.push(p);
-
-      setShakeProg(shakePoints.length);
-      setShakeLast(isHeads ? "HEADS → 1" : "TAILS → 2");
-
+      if (!shakeEnabled) return; const now = Date.now(); if (now - lastShakeTime < SHAKE_COOLDOWN_MS) return;
+      const acc = e.accelerationIncludingGravity || e.acceleration; if (!acc) return;
+      const mag = Math.sqrt(acc.x**2 + acc.y**2 + acc.z**2); if (mag < SHAKE_THRESHOLD) return;
+      lastShakeTime = now; const isHeads = (Math.floor(mag * 1000 + now) % 2) === 0;
+      coinEl.classList.remove("flip-heads","flip-tails"); void coinEl.offsetWidth;
+      coinEl.classList.add(isHeads ? "flip-heads" : "flip-tails");
+      shakePoints.push(isHeads ? 1 : 2); shakeProgEl.textContent = shakePoints.length;
+      shakeLastEl.textContent = isHeads ? "HEADS → 1" : "TAILS → 2";
       if (shakePoints.length >= 16) finalizeShakeCoin();
     }
-
-    async function requestMotionPermissionIfNeeded(){
-      if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
-        const res = await DeviceMotionEvent.requestPermission();
-        if (res !== "granted") throw new Error("motion permission denied");
-      }
-    }
-
     window.enableShakeCoin = async function(){
       try{
-        await requestMotionPermissionIfNeeded();
-        resetShakeCoin();
-        shakeEnabled = true;
-        setShakeStatus((I18N[currentLang]||I18N["zh-Hant"]).shakeCollecting);
+        if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") { await DeviceMotionEvent.requestPermission(); }
+        shakePoints = []; shakeEnabled = true; shakeStatusEl.textContent = (I18N[currentLang]||I18N["zh-Hant"]).shakeCollecting;
         window.addEventListener("devicemotion", onDeviceMotion, {passive:true});
-      }catch(err){
-        setShakeStatus((I18N[currentLang]||I18N["zh-Hant"]).shakeDenied);
-      }
+      }catch(err){ shakeStatusEl.textContent = (I18N[currentLang]||I18N["zh-Hant"]).shakeDenied; }
     };
+    window.disableShakeCoin = function(){ shakeEnabled = false; window.removeEventListener("devicemotion", onDeviceMotion); shakeStatusEl.textContent = (I18N[currentLang]||I18N["zh-Hant"]).shakeStopped; };
 
-    window.disableShakeCoin = function(){
-      shakeEnabled = false;
-      window.removeEventListener("devicemotion", onDeviceMotion, {passive:true});
-      setShakeStatus((I18N[currentLang]||I18N["zh-Hant"]).shakeStopped);
-    };
-
-    /* init */
     function init(){
-      // populate selects first
       populateSelects(false);
-
       const langSelect = document.getElementById("langSelect");
-      const saved = localStorage.getItem("geomancy_lang");
-      if (saved && (saved==="en" || saved==="zh-Hant")) langSelect.value = saved;
-
+      const saved = localStorage.getItem("geomancy_lang"); if (saved) langSelect.value = saved;
       applyLang(langSelect.value);
-
-      langSelect.addEventListener("change", ()=>{
-        applyLang(langSelect.value);
-        // 保持目前選取的四母卦，直接重算（不改卦）
-        const getV = (id) => document.getElementById(id).value.split("").map(Number);
-        runShield(getV('m1_s'), getV('m2_s'), getV('m3_s'), getV('m4_s'));
-        tapStage.textContent = stageLabel(tapCount);
-      });
-
-      // 初始隨機
+      langSelect.addEventListener("change", ()=>{ applyLang(langSelect.value); manualCast(); });
       randomCast();
     }
     init();
